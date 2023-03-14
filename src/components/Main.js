@@ -1,8 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { api } from "../utils/api";
 import Card from "./Card";
+import CurrentUserContext from "../contexts/CurrentUserContext";
 
 function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick }) {
+  const currentUser = useContext(CurrentUserContext);
+
   function handleEditAvatarClick() {
     onEditAvatar();
   }
@@ -13,23 +16,7 @@ function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick }) {
     onAddPlace();
   }
 
-  const [userName, setUserName] = useState("");
-  const [userDescription, setUserDescription] = useState("");
-  const [userAvatar, setUserAvatar] = useState("");
   const [cards, setCards] = useState([]);
-
-  useEffect(() => {
-    api
-      .getUserData()
-      .then((data) => {
-        setUserName(data.name);
-        setUserDescription(data.about);
-        setUserAvatar(data.avatar);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
 
   useEffect(() => {
     api
@@ -43,46 +30,48 @@ function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick }) {
   }, []);
 
   return (
-    <main className="content page__content">
-      <section className="profile">
-        <div className="profile__edit-block">
-          <div className="profile__avatar-wrapper">
-            <img
-              src={userAvatar}
-              alt="Ваш аватар"
-              className="profile__avatar"
-            />
-            <button
-              className="profile__avatar-edit-button"
-              onClick={handleEditAvatarClick}
-            ></button>
-          </div>
-          <div className="profile__info">
-            <div className="profile__info-wrapper">
-              <h1 className="profile__title">{userName}</h1>
+    <CurrentUserContext.Provider value={currentUser}>
+      <main className="content page__content">
+        <section className="profile">
+          <div className="profile__edit-block">
+            <div className="profile__avatar-wrapper">
+              <img
+                src={currentUser.avatar}
+                alt="Ваш аватар"
+                className="profile__avatar"
+              />
               <button
-                type="button"
-                className="profile__edit-button"
-                aria-label="Редактировать"
-                onClick={handleEditProfileClick}
+                className="profile__avatar-edit-button"
+                onClick={handleEditAvatarClick}
               ></button>
             </div>
-            <p className="profile__subtitle">{userDescription}</p>
+            <div className="profile__info">
+              <div className="profile__info-wrapper">
+                <h1 className="profile__title">{currentUser.name}</h1>
+                <button
+                  type="button"
+                  className="profile__edit-button"
+                  aria-label="Редактировать"
+                  onClick={handleEditProfileClick}
+                ></button>
+              </div>
+              <p className="profile__subtitle">{currentUser.about}</p>
+            </div>
           </div>
-        </div>
-        <button
-          className="profile__add-button"
-          type="button"
-          aria-label="Добавить"
-          onClick={handleAddPlaceClick}
-        ></button>
-      </section>
-      <section className="cards">
-        {cards.map((card) => (
-          <Card key={card._id} card={card} onCardClick={onCardClick} />
-        ))}
-      </section>
-    </main>
+          <button
+            className="profile__add-button"
+            type="button"
+            aria-label="Добавить"
+            onClick={handleAddPlaceClick}
+          ></button>
+        </section>
+        <section className="cards">
+          {cards.map((card) => (
+            <Card key={card._id} card={card} onCardClick={onCardClick} />
+          ))}
+        </section>
+      </main>
+    </CurrentUserContext.Provider>
   );
 }
 
