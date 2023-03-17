@@ -1,5 +1,4 @@
-import { useState, useEffect, useContext } from "react";
-import { api } from "../utils/api";
+import { useContext } from "react";
 import Card from "./Card";
 import CurrentUserContext from "../contexts/CurrentUserContext";
 
@@ -10,6 +9,7 @@ function Main({
   onCardClick,
   onCardDelete,
   onCardLike,
+  cards,
 }) {
   const currentUser = useContext(CurrentUserContext);
 
@@ -22,19 +22,6 @@ function Main({
   function handleAddPlaceClick() {
     onAddPlace();
   }
-
-  const [cards, setCards] = useState([]);
-
-  useEffect(() => {
-    api
-      .getInitialCards()
-      .then((cards) => {
-        setCards(cards);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [onCardLike]);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
