@@ -5,16 +5,16 @@ function AddPlacePopup(props) {
   const [name, setName] = React.useState("");
   const [link, setLink] = React.useState("");
 
-  function handleNameChange(evt) {
-    setName(evt.target.value);
+  function handleNameChange(event) {
+    setName(event.target.value);
   }
 
-  function handleLinkChange(evt) {
-    setLink(evt.target.value);
+  function handleLinkChange(event) {
+    setLink(event.target.value);
   }
 
-  function handleSubmit(evt) {
-    evt.preventDefault();
+  function handleSubmit(event) {
+    event.preventDefault();
 
     props.onSubmit({
       name,
