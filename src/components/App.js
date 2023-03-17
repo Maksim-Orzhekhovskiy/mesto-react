@@ -17,6 +17,7 @@ function App() {
     React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState(null);
   const [currentUser, setCurrentUser] = React.useState({});
+  const [cards, setCards] = React.useState([]);
 
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
@@ -31,6 +32,27 @@ function App() {
     setSelectedCard(card);
   }
 
+  function handleCardLike(card) {
+    const isLiked = card.likes.some((i) => i._id === currentUser._id);
+    api
+      .changeLikeCardStatus(card._id, !isLiked)
+      .then((newCard) => {
+        setCards((state) =>
+          state.map((c) => (c._id === card._id ? newCard : c))
+        );
+      })
+      .catch((err) => console.error(err));
+  }
+
+  function handleCardDelete(card) {
+    api
+      .deleteCard(card._id)
+      .then(() => {
+        setCards((state) => state.filter((c) => c._id !== card._id));
+      })
+      .catch((err) => console.error(err));
+  }
+
   function closeAllPopups() {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
@@ -40,13 +62,46 @@ function App() {
 
   React.useEffect(() => {
     Promise.all([api.getUserData(), api.getInitialCards()])
-      .then(([user]) => {
-        setCurrentUser(user);
+      .then(([userData, cardsData]) => {
+        setCurrentUser(userData);
+        setCards(cardsData);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
+  function handleUpdateUser(data) {
+    api
+      .editProfile(data)
+      .then((userData) => {
+        setCurrentUser(userData);
+        closeAllPopups();
       })
       .catch((err) => {
         console.error(err);
       });
-  }, []);
+  }
+
+  function handleUpdateAvatar(data) {
+    api
+      .editAvatar(data)
+      .then((userData) => {
+        setCurrentUser(userData);
+        closeAllPopups();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function handleAddPlaceSubmit(card) {
+    api
+      .addNewCard(card)
+      .then((card) => {
+        setCards([card, ...cards]);
+        closeAllPopups();
+      })
+      .catch((err) => console.error(`Ваще беда с карточками: ${err} `));
+  }
 
   return (
     <div className="App">
@@ -58,20 +113,26 @@ function App() {
             onAddPlace={handleAddPlaceClick}
             onEditAvatar={handleEditAvatarClick}
             onCardClick={handleCardClick}
+            cards={cards}
+            onCardLike={handleCardLike}
+            onCardDelete={handleCardDelete}
           />
           <Footer />
           <ImagePopup onClose={closeAllPopups} card={selectedCard} />
           <EditAvatarPopup
             isOpen={isEditAvatarPopupOpen}
             onClose={closeAllPopups}
+            onUpdateAvatar={handleUpdateAvatar}
           />
           <EditProfilePopup
             isOpen={isEditProfilePopupOpen}
             onClose={closeAllPopups}
+            onSubmit={handleUpdateUser}
           />
           <AddPlacePopup
             isOpen={isAddPlacePopupOpen}
             onClose={closeAllPopups}
+            onSubmit={handleAddPlaceSubmit}
           />
           {/* <div className="popup popup_type_delete-card">
             <div className="popup__container">

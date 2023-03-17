@@ -4,6 +4,10 @@ import CurrentUserContext from "../contexts/CurrentUserContext";
 function Card(props) {
   const currentUser = useContext(CurrentUserContext);
   const isOwn = props.card.owner._id === currentUser._id;
+  const isLiked = props.card.likes.some((like) => like._id === currentUser._id);
+  const cardLikeButtonClassName = `card__like ${
+    isLiked && "card__like_is-active"
+  }`;
 
   function handleClick() {
     props.onCardClick(props.card);
@@ -11,6 +15,10 @@ function Card(props) {
 
   function handleDeleteClick() {
     props.onCardDelete(props.card);
+  }
+
+  function handleLikeClick() {
+    props.onCardLike(props.card);
   }
 
   return (
@@ -34,12 +42,9 @@ function Card(props) {
         <div className="card__like-wrapper">
           <button
             type="button"
-            className={`card__like ${
-              props.card.likes.some((like) => like._id === currentUser._id)
-                ? "card__like_active"
-                : ""
-            }`}
+            className={cardLikeButtonClassName}
             aria-label="Мне нравится"
+            onClick={handleLikeClick}
           ></button>
           <p className="card__like-counter">{props.card.likes.length}</p>
         </div>

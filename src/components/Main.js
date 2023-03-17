@@ -3,7 +3,14 @@ import { api } from "../utils/api";
 import Card from "./Card";
 import CurrentUserContext from "../contexts/CurrentUserContext";
 
-function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick }) {
+function Main({
+  onEditProfile,
+  onAddPlace,
+  onEditAvatar,
+  onCardClick,
+  onCardDelete,
+  onCardLike,
+}) {
   const currentUser = useContext(CurrentUserContext);
 
   function handleEditAvatarClick() {
@@ -27,7 +34,7 @@ function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick }) {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [onCardLike]);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -67,7 +74,13 @@ function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick }) {
         </section>
         <section className="cards">
           {cards.map((card) => (
-            <Card key={card._id} card={card} onCardClick={onCardClick} />
+            <Card
+              key={card._id}
+              card={card}
+              onCardClick={onCardClick}
+              onCardDelete={onCardDelete}
+              onCardLike={onCardLike}
+            />
           ))}
         </section>
       </main>
