@@ -7,7 +7,7 @@ import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
 import ImagePopup from "./ImagePopup";
 import CurrentUserContext from "../contexts/CurrentUserContext";
-import { api } from "../utils/api";
+import api from "../utils/api";
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] =
